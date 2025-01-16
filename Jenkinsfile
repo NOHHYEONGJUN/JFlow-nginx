@@ -8,8 +8,8 @@ pipeline {
 
    environment {
        REGISTRY = 'harbor.jdevops.co.kr'
-       HARBOR_PROJECT = 'hyeongjun'
-       IMAGE_NAME = 'nginx'
+       HARBOR_PROJECT = 'test'
+       IMAGE_NAME = 'test-nginx'
        DOCKER_IMAGE = "${REGISTRY}/${HARBOR_PROJECT}/${IMAGE_NAME}"
        DOCKER_CREDENTIALS_ID = 'harbor-credentials'
        SONAR_TOKEN = credentials("sonarqube-credentials")
