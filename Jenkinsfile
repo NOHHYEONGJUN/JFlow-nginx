@@ -28,8 +28,8 @@ pipeline {
                    withSonarQubeEnv('sonarqube') {
                        sh """
                         sonar-scanner \\
-                        -Dsonar.projectKey=nginx \\
-                        -Dsonar.projectName=nginx \\
+                        -Dsonar.projectKey=test-nginx \\
+                        -Dsonar.projectName=test-nginx \\
                         -Dsonar.sources=. \\
                         -Dsonar.exclusions=**/node_modules/** \\
                         -Dsonar.login=${SONAR_TOKEN}
