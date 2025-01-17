@@ -8,8 +8,9 @@ pipeline {
 
    environment {
        REGISTRY = 'harbor.jdevops.co.kr'
-       HARBOR_PROJECT = 'test'
-       IMAGE_NAME = 'test-nginx'
+       // 수정해주세요
+       HARBOR_PROJECT = '사용자명 입력'
+       IMAGE_NAME = '이미지이름 입력'
        DOCKER_IMAGE = "${REGISTRY}/${HARBOR_PROJECT}/${IMAGE_NAME}"
        DOCKER_CREDENTIALS_ID = 'harbor-credentials'
        SONAR_TOKEN = credentials("sonarqube-credentials")
@@ -25,11 +26,12 @@ pipeline {
        stage('SonarQube Analysis') {
            steps {
                container('sonar-scanner') {
+                // 수정해주세요
                    withSonarQubeEnv('sonarqube') {
                        sh """
                         sonar-scanner \\
-                        -Dsonar.projectKey=test-nginx \\
-                        -Dsonar.projectName=test-nginx \\
+                        -Dsonar.projectKey=사용자명-서비스명 \\
+                        -Dsonar.projectName=사용자명-서비스명 \\
                         -Dsonar.sources=. \\
                         -Dsonar.exclusions=**/node_modules/** \\
                         -Dsonar.login=${SONAR_TOKEN}
