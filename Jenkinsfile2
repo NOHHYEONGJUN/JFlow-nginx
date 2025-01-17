@@ -3,8 +3,39 @@ pipeline {
     // Kubernetes 에이전트를 설정합니다.
     agent {
         kubernetes {
-            // 'docker-agent' 라벨을 가진 Pod을 생성합니다.
-            label 'docker-agent'
+            // Kubernetes Pod의 구성을 YAML 형식으로 정의합니다.
+            yaml """
+apiVersion: v1
+kind: Pod
+spec:
+  containers:
+  # Docker in Docker(dind) 컨테이너 설정
+  - name: docker
+    image: docker:dind
+    securityContext:
+      privileged: true    // 특권 모드로 실행하여 Docker 데몬 실행 권한을 부여합니다.
+    env:
+    - name: DOCKER_TLS_CERTDIR
+      value: ""          // TLS 인증서 디렉토리를 비활성화합니다.
+    volumeMounts:
+    - mountPath: /var/run
+      name: docker-sock  // Docker 소켓을 마운트합니다.
+    - mountPath: /var/lib/docker
+      name: docker-volume // Docker 이미지와 컨테이너 데이터를 저장할 볼륨을 마운트합니다.
+    tty: true
+  # SonarQube 스캐너 컨테이너 설정
+  - name: sonar-scanner
+    image: sonarsource/sonar-scanner-cli:latest
+    command:
+    - cat
+    tty: true
+  # 볼륨 정의
+  volumes:
+  - name: docker-sock    // Docker 소켓을 위한 임시 볼륨
+    emptyDir: {}
+  - name: docker-volume  // Docker 데이터를 위한 임시 볼륨
+    emptyDir: {}
+"""
             // 기본 컨테이너를 'docker'로 지정합니다.
             defaultContainer 'docker'
         }
@@ -44,12 +75,12 @@ pipeline {
                         // sonar-scanner 명령어를 실행하여 코드 분석을 수행합니다.
                         // 수정해주세요
                         sh """
-                         sonar-scanner \\
-                         -Dsonar.projectKey=<사용자명-서비스명> \\
-                         -Dsonar.projectName=<사용자명-서비스명> \\
-                         -Dsonar.sources=. \\
-                         -Dsonar.exclusions=**/node_modules/** \\
-                         -Dsonar.login=${SONAR_TOKEN}
+                            sonar-scanner \\
+                            -Dsonar.projectKey=<사용자명-서비스명> \\
+                            -Dsonar.projectName=<사용자명-서비스명> \\
+                            -Dsonar.sources=. \\
+                            -Dsonar.exclusions=**/node_modules/** \\
+                            -Dsonar.login=${SONAR_TOKEN}
                         """
                     }
                 }
